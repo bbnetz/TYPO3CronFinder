@@ -81,7 +81,53 @@ class TYPO3CronFinder {
 	 * Setting local settings from CLI params
 	 *
 	 */
-	public function __construct() {
+	public function __construct($argv) {
+		try{
+			// $path
+			if(!isset($argv[1])) throw new Exception('Please use correct usage: $ ./find.php path depth everyMinutes.');
+			if(!file_exists($argv[1])) throw new Exception('Basic Path does not exist.');
+			$this->path = $argv[1];
+
+			// $depth
+			if(!isset($argv[2])) throw new Exception('Please use correct usage: $ ./find.php path depth everyMinutes.');
+			if(intval($argv[2]) <= 0) throw new Exception('0 depth makes no sense...');
+			$this->depth = intval($argv[2]);
+
+			// $everyMinutes
+			if(!isset($argv[3])) throw new Exception('Please use correct usage: $ ./find.php path depth everyMinutes.');
+			if(intval($argv[3]) <= 0) throw new Exception('Running less than 1 makes no sense...');
+			if(intval($argv[3]) > 59) throw new Exception('Running more than 59 not yet implemented. If needed create an issue.');
+			$this->everyMinutes = intval($argv[3]);
+
+			// $cronPath
+			if(isset($argv[4])) {
+				if($argv[4] == 'NONE') {
+					$this->writeCron = false;
+				}else{
+					$this->cronPath = $argv[4];
+					if(!file_exists(dirname($this->cronPath))) throw new Exception('Path for CronJob does not exist!');
+					$this->writeCron = true;
+				}
+			}
+
+			// $cronUser
+			if(isset($argv[5])) {
+				if($argv[5] == 'owner') {
+					$this->useFileOwner = true;
+				}else{
+					$this->processUser = $argv[5];
+				}
+			}
+
+			// $quiet
+			if(isset($argv[4]) && $argv[4] == '-q') $this->quiet = true;
+			if(isset($argv[5]) && $argv[5] == '-q') $this->quiet = true;
+			if(isset($argv[6]) && $argv[6] == '-q') $this->quiet = true;
+
+		}catch(Exception $e){
+			echo $e->getMessage();
+			exit(0);
+		}
 		/**
 		 * @todo SET $this vars in here
 		 * @todo throwing exceptions if missconfigured
@@ -99,7 +145,7 @@ class TYPO3CronFinder {
 	public function run() {
 		$founds = $this->getTYPO3Instances();
 		if($this->writeCron) {
-			if(writeCronFile($this->cronPath, $this->buildCronFile($founds))) {
+			if($this->writeCronFile($this->cronPath, $this->buildCronFile($founds))) {
 				if(!$quiet) echo 'CronFile written to '.$this->cronPath;
 			}else{
 				$user = posix_getpwuid(posix_geteuid());
@@ -190,8 +236,7 @@ class TYPO3CronFinder {
 	}
 
 }
-
-$run = new TYPO3CronFinder();
+$run = new TYPO3CronFinder($argv);
 $run->run();
 
 ?>
