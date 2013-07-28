@@ -128,10 +128,6 @@ class TYPO3CronFinder {
 			echo $e->getMessage();
 			exit(0);
 		}
-		/**
-		 * @todo SET $this vars in here
-		 * @todo throwing exceptions if missconfigured
-		*/
 	}
 
 	/**
@@ -146,7 +142,7 @@ class TYPO3CronFinder {
 		$founds = $this->getTYPO3Instances();
 		if($this->writeCron) {
 			if($this->writeCronFile($this->cronPath, $this->buildCronFile($founds))) {
-				if(!$quiet) echo 'CronFile written to '.$this->cronPath;
+				if(!$this->quiet) echo 'CronFile written to '.$this->cronPath;
 			}else{
 				$user = posix_getpwuid(posix_geteuid());
 				echo 'CronFile not written. Please check path and rights.'.PHP_EOL;
@@ -211,9 +207,7 @@ class TYPO3CronFinder {
 	}
 
 	protected function writeCronFile($filename, $content) {
-		/**
-		 * @todo write WriteConfFile
-		 */
+		return file_put_contents($filename, $content);
 	}
 
 	/**
