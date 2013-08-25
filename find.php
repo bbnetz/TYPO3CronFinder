@@ -104,7 +104,7 @@ class TYPO3CronFinder {
 				if($argv[4] == 'NONE') {
 					$this->writeCron = false;
 				}else{
-					$this->cronPath = realpath($argv[4]);
+					$this->cronPath = $argv[4];
 					if(!file_exists(dirname($this->cronPath))) throw new Exception('Path for CronJob does not exist!');
 					$this->writeCron = true;
 				}
