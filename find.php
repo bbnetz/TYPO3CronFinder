@@ -85,8 +85,8 @@ class TYPO3CronFinder {
 		try{
 			// $path
 			if(!isset($argv[1])) throw new Exception('Please use correct usage: $ ./find.php path depth everyMinutes.');
-			if(!file_exists($argv[1])) throw new Exception('Basic Path does not exist.');
-			$this->path = $argv[1];
+			if(!file_exists(realpath($argv[1]))) throw new Exception('Basic Path does not exist.');
+			$this->path = realpath($argv[1]);
 
 			// $depth
 			if(!isset($argv[2])) throw new Exception('Please use correct usage: $ ./find.php path depth everyMinutes.');
@@ -104,7 +104,7 @@ class TYPO3CronFinder {
 				if($argv[4] == 'NONE') {
 					$this->writeCron = false;
 				}else{
-					$this->cronPath = $argv[4];
+					$this->cronPath = realpath($argv[4]);
 					if(!file_exists(dirname($this->cronPath))) throw new Exception('Path for CronJob does not exist!');
 					$this->writeCron = true;
 				}
